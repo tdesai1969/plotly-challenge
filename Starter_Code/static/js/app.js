@@ -2,18 +2,15 @@ var url = "./samples.json";
 d3.json(url).then(function (data) {
     console.log(data)});
 
-    function demoInfo(individual) {
-        d3.json(url).then((data) => { 
-            var individuals = data.metadata;
-            var filterArrey1 = individuals.filter(k => k.id == individual);
-            var indiResult = filterArrey1[0];
-            var ethnicity = indiResult.ethnicity;
-            var gender = indiResult.gender;
-            var age = indiResult.age;
-            var location = indiResult.location;
+    function demoInfo(demographics) {
+        var panel = d3.select("#sample-metadata");
+        panel.html("");
+        Object.entries(demographics).forEach(([key, value]) => {
+            panel.append("span")
+                .html(`${key} : ${value}`)
+                .append("br");
         })
-            };
-
+    };
 
     function createChart(sample) {
         d3.json(url).then((data) => { 
@@ -64,17 +61,29 @@ d3.json(url).then(function (data) {
 
     function init(){
         var dropDownselector = d3.select("#selDataset");
+        var demoSelector = d3.select("#sample-metadata");
         d3.json(url).then((data) => { 
             var samples_name = data.names;
+            var samples_indi = data.metadata;
             samples_name.forEach((sample)=>{
                 dropDownselector.append("option").text(sample).property("value",sample);
+
+            samples_indi.forEach((demographics)=>{
+                demoSelector.append("option").text(demographics).property("value",demographics);
+                });
+
             });
             var sample1 = samples_name[0];
             createChart(sample1);
+
+            var sample2 = samples_indi[0];
+            demoInfo(sample2);
         });
         }
+
         function optionChanged(newSample) 
         {
             createChart(newSample);
         }
+
         init();
